@@ -56,13 +56,13 @@ int readFiles(const char * dirName, char *** filenames) {
  *                      for wildcard dot.
  *             strPtr: a pointer to a char array that stores the replacement
  *                     for wildcard Kleene star.
- * Return value: 1 indicate that pattern is found.
+ * Return value: 1 indicates that pattern is found.
  */
 int match(char * str, char * pattern, char * charPtr, char * strPtr) {
   /* Loop through each character of pattern. */
   while (*pattern) {
     /* If meet a wildcard dot, store it to charPtr array and increment
-       all pointers. */
+       str, pattern, and charPtr pointers. */
     if (*pattern == '.') {
       *charPtr++ = *str++;
       pattern++;
@@ -73,17 +73,16 @@ int match(char * str, char * pattern, char * charPtr, char * strPtr) {
        match recursively until the pattern is found or we reach the end of the
        string. Store the replacement string then. */
     if (*pattern == '*') {
-      int result; /* Store the result of recursive call. */
       char * start = str; /* Store the original position. */
       pattern++;
       while (*str) {
-        result = match(str, pattern, charPtr, strPtr + (str - start) + 1);
-        if (result) {
+        if (match(str, pattern, charPtr, strPtr + (str - start) + 1)) {
           strncpy(strPtr, start, str - start);
           return 1;
         }
         str++;
       }
+      return 0;
     }
 
     /* Return 0 if meet an unmatched character. */
@@ -169,7 +168,7 @@ int main(int argc, char ** argv) {
 
   getcwd(buffer, BUFSIZ); /* Default current directory. */
 
-  /* Parse command line argument. */
+  /* Parse command line arguments. */
   while ((opt = getopt(argc, argv, "d:x")) != -1) {
     switch (opt) {
       case 'd':
